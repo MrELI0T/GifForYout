@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Encrypted</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #4A9FD4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 40px 20px;
+            overflow-x: hidden;
+        }
+
+        /* Glitch effect background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0,0,0,0.03) 0px,
+                rgba(0,0,0,0.03) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        /* Notification Box */
+        .notification-box {
+            background: rgba(255,255,255,0.85);
+            border-radius: 8px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .notification-box h1 {
+            font-size: 18px;
+            color: #c0392b;
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .notification-box p {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .notification-box .warning {
+            color: #c0392b;
+            font-weight: 600;
+        }
+
+        /* Timer Section */
+        .timer-section {
+            margin: 15px 0;
+        }
+
+        .timer-label {
+            font-size: 13px;
+            color: #777;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .timer {
+            font-size: 36px;
+            font-weight: 700;
+            color: #c0392b;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 10px rgba(192,57,43,0.3);
+        }
+
+        .timer span {
+            display: inline-block;
+            min-width: 50px;
+        }
+
+        /* System Info */
+        .system-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #666;
+            flex-wrap: wrap;
+        }
+
+        .system-info div {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .system-info .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e74c3c;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        /* Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border: 1px solid #999;
+            background: rgba(255,255,255,0.6);
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #555;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            background: rgba(255,255,255,0.9);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-danger {
+            background: #c0392b;
+            color: white;
+            border-color: #c0392b;
+        }
+
+        .btn-danger:hover {
+            background: #a93226;
+        }
+
+        /* Jester Mask */
+        .jester-container {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .jester-mask {
+            width: 200px;
+            height: 200px;
+            position: relative;
+        }
+
+        /* SVG Jester Mask */
+        .jester-svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));
+        }
+
+        /* Floating animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .jester-container {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Bottom Message */
+        .bottom-message {
+            text-align: center;
+            margin-top: 30px;
+            color: rgba(255,255,255,0.9);
+            font-size: 13px;
+            line-height: 1.8;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .bottom-message h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .bottom-message .highlight {
+            color: #ffeb3b;
+            font-weight: 600;
+        }
+
+        /* Encrypted Files Section */
+        .files-section {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .files-section.active {
+            display: block;
+        }
+
+        .files-section h3 {
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .file-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 8px;
+        }
+
+        .file-item {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #ffeb3b;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-item::before {
+            content: '🔒';
+            font-size: 10px;
+        }
+
+        /* Payment Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        .modal h2 {
+            color: #c0392b;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        .modal .btc-address {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            word-break: break-all;
+            margin: 15px 0;
+            border: 1px dashed #999;
+            user-select: all;
+        }
+
+        .modal .amount {
+            font-size: 28px;
+            font-weight: 700;
+            color: #c0392b;
+            margin: 10px 0;
+        }
+
+        .modal-close {
+            margin-top: 20px;
+            padding: 10px 30px;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* Scanline effect */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0,0,0,0.05) 50%,
+                rgba(0,0,0,0.05)
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* Glitch text */
+        .glitch {
+            position: relative;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            animation: glitch-1 2s infinite;
+            color: #ff00ff;
+            z-index: -1;
+        }
+
+        .glitch::after {
+            animation: glitch-2 2s infinite;
+            color: #00ffff;
+            z-index: -2;
+        }
+
+        @keyframes glitch-1 {
+            0%, 100% { clip-path: inset(0 0 95% 0); transform: translate(-2px, 0); }
+            20% { clip-path: inset(20% 0 60% 0); transform: translate(2px, 0); }
+            40% { clip-path: inset(40% 0 40% 0); transform: translate(-2px, 0); }
+            60% { clip-path: inset(60% 0 20% 0); transform: translate(2px, 0); }
+            80% { clip-path: inset(80% 0 5% 0); transform: translate(-2px, 0); }
+        }
+
+        @keyframes glitch-2 {
+            0%, 100% { clip-path: inset(95% 0 0 0); transform: translate(2px, 0); }
+            20% { clip-path: inset(60% 0 20% 0); transform: translate(-2px, 0); }
+            40% { clip-path: inset(40% 0 40% 0); transform: translate(2px, 0); }
+            60% { clip-path: inset(20% 0 60% 0); transform: translate(-2px, 0); }
+            80% { clip-path: inset(5% 0 80% 0); transform: translate(2px, 0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .timer { font-size: 24px; }
+            .jester-mask { width: 150px; height: 150px; }
+            .notification-box { padding: 15px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scanlines"></div>
+
+    <div class="container">
+        <!-- Notification Box -->
+        <div class="notification-box">
+            <h1 class="glitch" data-text="#OPfailwhale">#OPfailwhale</h1>
+            <p>Your files are encrypted.</p>
+            <p>To get the key to decrypt files, you have to pay <span class="warning">5.9 million USD</span>. If payment is not made by tomorrow night, we'll brick your entire system.</p>
+            
+            <div class="timer-section">
+                <div class="timer-label">Time Remaining</div>
+                <div class="timer" id="countdown">
+                    <span id="hours">14</span>h 
+                    <span id="minutes">04</span>m 
+                    <span id="seconds">07</span>s
+                </div>
+            </div>
+
+            <div class="system-info">
+                <div><span class="dot"></span> Your system: fsociety.encrypted</div>
+                <div>📁 Total encrypted: <span id="fileCount">1,247</span> files</div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn" onclick="showFiles()">📁 Files</button>
+                <button class="btn" onclick="showPayment()">💰 Payment</button>
+                <button class="btn" onclick="showFAQ()">❓ FAQ</button>
+                <button class="btn" onclick="showDecrypt()">🔓 Decrypt One File</button>
+                <button class="btn btn-danger" onclick="showSupport()">📞 Support</button>
+            </div>
+        </div>
+
+        <!-- Encrypted Files Section -->
+        <div class="files-section" id="filesSection">
+            <h3>🔐 Encrypted Files</h3>
+            <div class="file-list" id="fileList"></div>
+        </div>
+
+        <!-- Jester Mask -->
+        <div class="jester-container">
+            <div class="jester-mask">
+                <svg class="jester-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Hat -->
+                    <path d="M70 80 Q50 20 30 40 Q40 60 60 75" fill="#8B2635" stroke="#5a1a22" stroke-width="2"/>
+                    <path d="M130 80 Q150 20 170 40 Q160 60 140 75" fill="#8B2635" stroke="#5a1a22" stroke-width="2"/>
+                    <path d="M60 75 Q100 50 140 75 L130 100 Q100 90 70 100 Z" fill="#8B2635" stroke="#5a1a22" stroke-width="2"/>
+                    
+                    <!-- Hat bells -->
+                    <circle cx="30" cy="40" r="6" fill="#ddd" stroke="#999" stroke-width="1"/>
+                    <circle cx="170" cy="40" r="6" fill="#ddd" stroke="#999" stroke-width="1"/>
+                    
+                    <!-- Face shape -->
+                    <path d="M70 100 Q100 85 130 100 Q140 130 130 160 Q100 175 70 160 Q60 130 70 100" fill="#e8e8e8" stroke="#ccc" stroke-width="1"/>
+                    
+                    <!-- Eyes -->
+                    <ellipse cx="85" cy="125" rx="12" ry="8" fill="#2c2c2c"/>
+                    <ellipse cx="115" cy="125" rx="12" ry="8" fill="#2c2c2c"/>
+                    <ellipse cx="85" cy="123" rx="4" ry="3" fill="#ff4444"/>
+                    <ellipse cx="115" cy="123" rx="4" ry="3" fill="#ff4444"/>
+                    
+                    <!-- Nose -->
+                    <circle cx="100" cy="140" r="6" fill="#8B2635"/>
+                    
+                    <!-- Grin -->
+                    <path d="M75 150 Q100 175 125 150" fill="none" stroke="#2c2c2c" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M72 148 Q100 180 128 148" fill="#2c2c2c"/>
+                    
+                    <!-- Teeth -->
+                    <rect x="85" y="155" width="6" height="8" fill="#fff" rx="1"/>
+                    <rect x="95" y="158" width="6" height="8" fill="#fff" rx="1"/>
+                    <rect x="105" y="158" width="6" height="8" fill="#fff" rx="1"/>
+                    <rect x="115" y="155" width="6" height="8" fill="#fff" rx="1"/>
+                    
+                    <!-- Chin -->
+                    <path d="M85 170 Q100 180 115 170" fill="none" stroke="#999" stroke-width="1"/>
+                    
+                    <!-- Shadow -->
+                    <ellipse cx="100" cy="185" rx="40" ry="8" fill="rgba(0,0,0,0.15)"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Bottom Message -->
+        <div class="bottom-message">
+            <h3 class="glitch" data-text="SYSTEM ACTIVATION">SYSTEM ACTIVATION</h3>
+            <p>There's an <span class="highlight">infinite amount of peace</span> and that is more strange.<br>
+            The trick is to figure that there are no consequences.</p>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="modal">
+            <h2>💰 Payment Required</h2>
+            <p>Send exactly:</p>
+            <div class="amount">₿ 142.85 BTC</div>
+            <p>≈ $5,900,000.00 USD</p>
+            <p>To this address:</p>
+            <div class="btc-address">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</div>
+            <p style="font-size: 12px; color: #666; margin-top: 10px;">⚠️ Payment must be confirmed within the time limit.<br>After confirmation, decryption key will be sent automatically.</p>
+            <button class="modal-close" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- FAQ Modal -->
+    <div class="modal-overlay" id="faqModal">
+        <div class="modal">
+            <h2>❓ Frequently Asked Questions</h2>
+            <div style="text-align: left; font-size: 13px; line-height: 1.8; color: #555;">
+                <p><strong>Q: Can I recover my files without paying?</strong><br>A: No. AES-256 encryption with RSA-4096 key. Brute force would take ~10^38 years.</p>
+                <p><strong>Q: What happens if I don't pay?</strong><br>A: Your private key will be permanently deleted. Files remain encrypted forever.</p>
+                <p><strong>Q: Will paying guarantee decryption?</strong><br>A: Yes. Our reputation depends on it. Check our TrustPilot: ★★★★★</p>
+                <p><strong>Q: Can I negotiate the price?</strong><br>A: No. The price is fixed. Delay = price doubles every 24h.</p>
+            </div>
+            <button class="modal-close" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- Decrypt Modal -->
+    <div class="modal-overlay" id="decryptModal">
+        <div class="modal">
+            <h2>🔓 Decrypt One File</h2>
+            <p style="color: #666; font-size: 13px;">We can decrypt one file for free as proof.</p>
+            <input type="file" id="decryptFile" style="margin: 15px 0; padding: 10px; border: 1px dashed #999; border-radius: 6px; width: 100%;">
+            <button class="btn btn-danger" style="width: 100%; padding: 12px;" onclick="fakeDecrypt()">Upload & Decrypt</button>
+            <p id="decryptResult" style="margin-top: 10px; font-size: 13px;"></p>
+            <button class="modal-close" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- Support Modal -->
+    <div class="modal-overlay" id="supportModal">
+        <div class="modal">
+            <h2>📞 Support Chat</h2>
+            <div style="background: #f5f5f5; border-radius: 8px; padding: 15px; height: 200px; overflow-y: auto; text-align: left; font-size: 13px; margin-bottom: 15px;" id="chatBox">
+                <p style="color: #c0392b;"><strong>fsociety:</strong> Welcome. State your business.</p>
+            </div>
+            <input type="text" id="chatInput" placeholder="Type your message..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 10px;">
+            <button class="btn btn-danger" style="width: 100%;" onclick="sendChat()">Send</button>
+            <button class="modal-close" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Countdown Timer
+        let hours = 14, minutes = 4, seconds = 7;
+        
+        function updateTimer() {
+            seconds--;
+            if (seconds < 0) {
+                seconds = 59;
+                minutes--;
+            }
+            if (minutes < 0) {
+                minutes = 59;
+                hours--;
+            }
+            if (hours < 0) {
+                hours = 0; minutes = 0; seconds = 0;
+            }
+            
+            document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+        }
+        
+        setInterval(updateTimer, 1000);
+
+        // File list generation
+        const fileExtensions = ['.docx', '.pdf', '.jpg', '.png', '.xlsx', '.pptx', '.mp4', '.zip', '.sql', '.db'];
+        const fileNames = ['report', 'budget', 'family_photos', 'project_alpha', 'database_backup', 'financials', 'contracts', 'passwords', 'emails', 'invoices'];
+        
+        function generateFiles() {
+            const list = document.getElementById('fileList');
+            list.innerHTML = '';
+            for (let i = 0; i < 12; i++) {
+                const name = fileNames[Math.floor(Math.random() * fileNames.length)] + '_' + Math.floor(Math.random() * 999);
+                const ext = fileExtensions[Math.floor(Math.
